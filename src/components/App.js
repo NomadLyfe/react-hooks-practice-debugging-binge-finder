@@ -13,7 +13,7 @@ function App() {
   const [filterByRating, setFilterByRating] = useState("");
 
   useEffect(() => {
-    Adapter.getShows().then((shows) => setShows(shows));
+    Adapter.getShows(setShows);
   }, []);
 
   useEffect(() => {
@@ -21,27 +21,20 @@ function App() {
   });
 
   function handleSearch(e) {
-    setSearchTerm(e.target.value.toLowerCase());
+    setSearchTerm(e.target.value);
   }
 
   function handleFilter(e) {
-    e.target.value === "No Filter"
-      ? setFilterByRating("")
-      : setFilterByRating(e.target.value);
+    e.target.value === "No Filter" ? setFilterByRating("") : setFilterByRating(Number(e.target.value));
   }
 
   function selectShow(show) {
-    Adapter.getShowEpisodes(show.id).then((episodes) => {
-      setSelectedShow(show);
-      setEpisodes(episodes);
-    });
+    Adapter.getShowEpisodes(setSelectedShow, setEpisodes, show);
   }
 
   let displayShows = shows;
   if (filterByRating) {
-    displayShows = displayShows.filter((s) => {
-      s.rating.average >= filterByRating;
-    });
+    displayShows = displayShows.filter((s) => s.rating.average >= filterByRating);
   }
 
   return (
@@ -49,11 +42,11 @@ function App() {
       <Nav
         handleFilter={handleFilter}
         handleSearch={handleSearch}
-        searchTerm={searchTerm}
+        search={searchTerm}
       />
       <Grid celled>
         <Grid.Column width={5}>
-          {!!selectedShow ? (
+          {selectedShow ? (
             <SelectedShowContainer
               selectedShow={selectedShow}
               allEpisodes={episodes}
